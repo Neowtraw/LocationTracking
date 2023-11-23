@@ -57,4 +57,13 @@ dependencies {
     // navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+
+    // firebase
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.google.play.services.auth)
+
+    // lottie
+    implementation(libs.lottie)
 }

@@ -16,4 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "LocationTracking"
 include(":app")
- 
+include(":domain")
+include(":data")
