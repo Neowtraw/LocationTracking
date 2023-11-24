@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.IntentSender
 import com.codingub.locationtracking.R
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdTokenRequestOptions
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -16,7 +17,6 @@ class GoogleAuthUiClient(
     private val context: Context,
     private val oneTapClient: SignInClient
 ) {
-
     private val auth = Firebase.auth
 
     suspend fun signIn(): IntentSender? {
@@ -79,7 +79,7 @@ class GoogleAuthUiClient(
     private fun buildSignInRequest(): BeginSignInRequest {
         return BeginSignInRequest.Builder()
             .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
                     .setFilterByAuthorizedAccounts(false)
                     .setServerClientId(context.getString(R.string.web_client_id))

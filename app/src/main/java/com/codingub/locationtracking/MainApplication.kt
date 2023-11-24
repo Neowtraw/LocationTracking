@@ -2,6 +2,7 @@ package com.codingub.locationtracking
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 
 
 @HiltAndroidApp
@@ -14,6 +15,10 @@ class MainApplication : Application() {
 
     init {
         Instance = this
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
     }
 
 }

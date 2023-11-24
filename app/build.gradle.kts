@@ -39,10 +39,17 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
+
     }
 }
 
 dependencies {
+
+    // androidx
+    implementation(libs.androidx.work)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.fragment)
 
     // lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -66,4 +73,7 @@ dependencies {
 
     // lottie
     implementation(libs.lottie)
+
+    // timber - test
+    implementation(libs.timber)
 }

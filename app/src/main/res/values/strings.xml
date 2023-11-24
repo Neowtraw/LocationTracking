@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">LocationTracking</string>
-    <string name="web_client_id">LocationTracking</string>
+    <string name="web_client_id">264606735150-lktur9dvc9qnsbbp3kgf4lpm35ng14m0.apps.googleusercontent.com</string>
     <string name="google_auth">Авторизоваться через Google</string>
 </resources>

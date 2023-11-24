@@ -25,15 +25,16 @@ androidxRecyclerView = "1.3.2"
 androidxRoom = "2.6.0"
 androidxSecurityCrypto = "1.0.0"
 androidxSwipeRefreshLayout = "1.1.0"
+androidXWork = "2.7.0"
 
 chartView = "v3.1.0"
 circleIndicatorView = "2.1.6"
 countryCodePicker = "2.7.3"
 cropView = "1.1.8"
 
-daggerHilt = "2.48"
+daggerHilt = "2.48.1"
 
-firebaseAuth = "22.2.0"
+firebaseAuth = "22.3.0"
 playServicesAuth = "20.7.0"
 
 # test
@@ -57,7 +58,9 @@ junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 
-lottie = "3.4.0"
+timber = "5.0.1"
+
+lottie = "5.0.3"
 
 [libraries]
 
@@ -68,6 +71,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "androidxFragment" }
 androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "androidxRecyclerView" }
 androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "androidxSwipeRefreshLayout" }
+androidx-work = {group = "androidx.work", name = "work-runtime-ktx", version.ref = "androidXWork"}
 
 chartView = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "chartView" }
 circleIndicatorView = { group = "me.relex", name = "circleindicator", version.ref = "circleIndicatorView" }
@@ -84,8 +88,6 @@ dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android", vers
 # authentication
 firebase-auth-ktx = {group = "com.google.firebase", name = "firebase-auth-ktx", version.ref = "firebaseAuth"}
 firebase-auth = {group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth"}
-google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
-play-services-auth = {group = "com.google.android.gms", name = "firebase-auth", version.ref = "playServicesAuth"}
 
 # javax
 javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
@@ -114,6 +116,8 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 # google
 google-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googlePlayServicesAuth" }
 google-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googlePlayServicesMaps" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+
 
 # room DB
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }
@@ -128,6 +132,8 @@ androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso-core" }
 
 lottie = {group = "com.airbnb.android", name = "lottie", version.ref = "lottie"}
+
+timber = {group = "com.jakewharton.timber", name = "timber", version.ref = "timber"}
 
 [plugins]
 
