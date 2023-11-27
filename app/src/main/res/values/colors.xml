@@ -2,4 +2,19 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="background">#FFFFFFFF</color>
+
+
+    <!-- circle -->
+    <color name="main_text_color">#144A60</color>
+
+    <color name="additional_gen_color">#EDEDED</color>
+    <color name="main_gen_color">#FFFFFF</color>
+
+
+    <!-- circle -->
+    <color name="online">#71BB3A</color>
+    <color name="offline">#980C0C</color>
+    <color name="loading">#FF9800</color>
 </resources>

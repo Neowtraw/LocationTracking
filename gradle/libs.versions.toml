@@ -52,6 +52,9 @@ googleMaterial = "1.10.0"
 
 googlePlayServicesMaps = "18.2.0"
 googlePlayServicesAuth = "20.7.0"
+googlePlayServicesLocation = "21.0.1"
+
+yandexMaps = "4.4.0-lite"
 
 gson = "2.10.1"
 junit = "4.13.2"
@@ -117,7 +120,10 @@ androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation
 google-play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "googlePlayServicesAuth" }
 google-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "googlePlayServicesMaps" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
+google-play-services-location = {group = "com.google.android.gms", name = "play-services-location", version.ref = "googlePlayServicesLocation"}
 
+# yandex
+yandex-maps = { group = "com.yandex.android", name = "maps.mobile", version.ref = "yandexMaps" }
 
 # room DB
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "androidxRoom" }

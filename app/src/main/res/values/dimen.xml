@@ -4,4 +4,5 @@
     <dimen name="main_margin">16dp</dimen>
     <dimen name="main_divider">20dp</dimen>
     <dimen name="main_corner">15dp</dimen>
+    <dimen name="main_text">15sp</dimen>
 </resources>

@@ -1,9 +1,14 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+
 plugins {
     id("codingub.android.application")
     id("codingub.android.hilt")
     id("codingub.android.room")
     id("codingub.android.retrofit")
 }
+
+val properties = gradleLocalProperties(rootDir)
+
 
 android {
     namespace = "com.codingub.locationtracking"
@@ -32,9 +37,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "MAPKIT_API_KEY", "\"${properties.getProperty("MAPKIT_API_KEY")}\"")
+
         }
         debug {
             isMinifyEnabled = false
+            buildConfigField("String", "MAPKIT_API_KEY", "\"${properties.getProperty("MAPKIT_API_KEY")}\"")
+
         }
     }
     buildFeatures {
@@ -70,6 +79,10 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.auth)
     implementation(libs.google.play.services.auth)
+
+    //geo
+    implementation(libs.google.play.services.location)
+    implementation(libs.yandex.maps)
 
     // lottie
     implementation(libs.lottie)

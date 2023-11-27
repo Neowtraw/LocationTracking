@@ -2,6 +2,10 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("http://maven.google.com/")
+            isAllowInsecureProtocol = true
+        }
     }
     versionCatalogs {
         create("libs") {
@@ -12,3 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "build-logic"
 include(":convention")
+

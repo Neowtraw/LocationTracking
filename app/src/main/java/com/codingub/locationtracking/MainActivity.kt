@@ -1,17 +1,19 @@
 package com.codingub.locationtracking
 
+import android.Manifest
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import com.codingub.locationtracking.databinding.ActivityMainBinding
 import com.codingub.locationtracking.ui.auth.GoogleAuthUiClient
-import com.codingub.locationtracking.ui.fragments.LoginFragment
-import com.codingub.locationtracking.ui.fragments.TrackingFragment
+import com.codingub.locationtracking.ui.geo.GeofenceBroadcastReceiver
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.mapview.MapView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -19,6 +21,8 @@ class MainActivity : AppCompatActivity() {
 
     val mainViewModel by viewModels<MainViewModel>()
     private lateinit var binding: ActivityMainBinding
+
+
 
     @Inject
     lateinit var googleAuthUiClient: GoogleAuthUiClient
@@ -28,53 +32,20 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        // observeChanges()
+
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_container_view) as NavHostFragment
+        val navController = navHostFragment.navController
 
         if (googleAuthUiClient.getSignedInUser() != null) {
 
             if (savedInstanceState == null) {
-                supportFragmentManager.beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_view, TrackingFragment())
-                    .commit()
-            }
-        } else {
-            supportFragmentManager.beginTransaction()
-                .setReorderingAllowed(true)
-                .add(R.id.fragment_container_view, LoginFragment())
-                .commit()
-        }
-
-        observeChanges()
-    }
-
-
-    private fun observeChanges() {
-        with(mainViewModel) {
-            lifecycleScope.launch(Dispatchers.Main) {
-
-                if (state.value.isSignInSuccessful) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Sign in successful",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    supportFragmentManager.beginTransaction()
-                        .setReorderingAllowed(true)
-                        .replace(R.id.fragment_container_view, TrackingFragment())
-                        .commit()
-                }
-                if (googleAuthUiClient.getSignedInUser() != null) {
-                    Toast.makeText(
-                        applicationContext,
-                        "Sign in successful",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    supportFragmentManager.beginTransaction()
-                        .setReorderingAllowed(true)
-                        .replace(R.id.fragment_container_view, TrackingFragment())
-                        .commit()
-                }
+                navController.navigate(R.id.trackingFragment)
+                return
             }
         }
+        navController.navigate(R.id.loginFragment)
     }
 }

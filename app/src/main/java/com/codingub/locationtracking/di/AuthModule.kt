@@ -17,6 +17,9 @@ import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import com.codingub.locationtracking.utils.Logger
+
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -32,6 +35,7 @@ object AuthModule {
 
         return activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
             if (result.resultCode == AppCompatActivity.RESULT_OK) {
+
                 activity.lifecycleScope.launch {
                     val signInResult = googleAuthUiClient.signInWithIntent(
                         intent = result.data ?: return@launch

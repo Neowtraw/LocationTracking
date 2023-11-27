@@ -1,19 +1,14 @@
 package com.codingub.locationtracking.ui.fragments
 
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.IntentSender
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.codingub.locationtracking.MainActivity
+import androidx.navigation.findNavController
+import com.codingub.locationtracking.R
 import com.codingub.locationtracking.databinding.FragmentLoginBinding
 import com.codingub.locationtracking.ui.auth.GoogleAuthUiClient
 import com.codingub.locationtracking.utils.BaseFragment
@@ -27,9 +22,12 @@ class LoginFragment() : BaseFragment() {
 
     private lateinit var binding: FragmentLoginBinding
 
-    @Inject lateinit var log: Logger
-    @Inject lateinit var googleAuthUiClient: GoogleAuthUiClient
-    @Inject lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
+    @Inject
+    lateinit var log: Logger
+    @Inject
+    lateinit var googleAuthUiClient: GoogleAuthUiClient
+    @Inject
+    lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
 
 
     override fun onCreateView(
@@ -43,12 +41,13 @@ class LoginFragment() : BaseFragment() {
         return binding.root
     }
 
-    private fun setupListeners() {
-        binding.btnSignIn.setOnClickListener {
-            lifecycleScope.launch {
-                val intent = googleAuthUiClient.signIn()
 
-                log.d(intent.toString())
+    private fun setupListeners() {
+        binding.btnSignIn.setOnClickListener { view ->
+            lifecycleScope.launch {
+                view.findNavController().navigate(R.id.action_loginFragment_to_trackingFragment)
+
+                val intent = googleAuthUiClient.signIn()
                 launcher.launch(
                     IntentSenderRequest.Builder(
                         intentSender = intent ?: return@launch
