@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background_main_rounded"
+        android:padding="16dp"
+        android:layout_marginEnd="100dp"
+        android:layout_marginStart="100dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/warning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/main_text"
+            android:textColor="@color/main_text_color"
+            android:text="@string/location_permission_warning"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accept_permissions"
+            android:textSize="@dimen/main_text"
+            android:textColor="@color/main_text_color"
+            android:layout_alignParentEnd="true"
+            android:layout_below="@id/warning"
+            android:paddingTop="@dimen/main_padding"
+            />
+
+
+    </RelativeLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

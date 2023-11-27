@@ -6,4 +6,6 @@
     <string name="online">В сети</string>
     <string name="offline">Не в сети</string>
     <string name="loading">Загружается</string>
+    <string name="location_permission_warning">Чтобы пользоваться картой, вам необходимо принять хотя бы 1 из разрешений локации</string>
+    <string name="accept_permissions">Принять разрешения</string>
 </resources>

@@ -4,8 +4,6 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +11,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresPermission
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
+import com.codingub.locationtracking.R
 import com.codingub.locationtracking.databinding.FragmentTrackingBinding
 import com.codingub.locationtracking.ui.geo.GeofenceManager
 import com.codingub.locationtracking.ui.viewmodels.TrackingViewModel
@@ -27,14 +24,18 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.PlacemarkMapObject
+import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -51,9 +52,17 @@ class TrackingFragment : BaseFragment() {
     lateinit var geofenceManager: GeofenceManager
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var locationInfo: String? = null
+    private lateinit var marker: PlacemarkMapObject
+
+    private lateinit var locationCallback: LocationCallback
 
     // geo permissions
     private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
+    private lateinit var backgroundPermissionRequest: ActivityResultLauncher<String>
+
+    companion object {
+        const val ZOOM_VALUE = 16.5f
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,16 +71,33 @@ class TrackingFragment : BaseFragment() {
         locationPermissionRequest =
             requireActivity().registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
                 when {
-                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {}
+                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                        createLocationRequest(true)
+
+                    }
 
                     permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                        createLocationRequest(false)
                     }
-                    permissions.getOrDefault(
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                        false
-                    ) -> {}
+
                     else -> {
+
                     }
+                }
+            }
+
+        // background location permission
+        backgroundPermissionRequest =
+            requireActivity().registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    // Permission is granted. Continue the action or workflow in your
+                    // app.
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // feature requires a permission that the user has denied. At the
+                    // same time, respect the user's decision. Don't link to system
+                    // settings in an effort to convince the user to change their
+                    // decision.
                 }
             }
 
@@ -84,11 +110,12 @@ class TrackingFragment : BaseFragment() {
 
         // background location
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION))
+            backgroundPermissionRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
         }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-
+        createLocationEffect()
+        createLocationRequest(true)
     }
 
     override fun onCreateView(
@@ -106,28 +133,95 @@ class TrackingFragment : BaseFragment() {
 
         MapKitFactory.getInstance().onStart()
         binding.mapview.onStart()
+        startLocationUpdates()
+        createMarkerInCurrentLocation()
     }
+
     override fun onStop() {
         super.onStop()
+        stopLocationUpdates()
         binding.mapview.onStop()
         MapKitFactory.getInstance().onStop()
     }
 
+    /*
+        Geo updates
+     */
 
-    fun createLocationRequest(usePreciseLocation: Boolean) {
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
+    )
+    private fun createLocationRequest(usePreciseLocation: Boolean) {
         val priority = if (usePreciseLocation) {
             Priority.PRIORITY_HIGH_ACCURACY
         } else {
             Priority.PRIORITY_BALANCED_POWER_ACCURACY
         }
-        LocationRequest.Builder(priority, TimeUnit.SECONDS.toMillis(3)).build()
+        trackingViewModel.locationRequest.value =
+            LocationRequest.Builder(priority, TimeUnit.SECONDS.toMillis(3)).build()
     }
 
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
+    )
+    fun startLocationUpdates() {
+        fusedLocationClient.requestLocationUpdates(
+            trackingViewModel.locationRequest.value!!,
+            locationCallback,
+            null
+        )
+    }
 
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
+    )
+    fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+
+    @RequiresPermission(
+        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
+    )
+    private fun createLocationEffect() {
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                val location = result.lastLocation ?: return
+                moveToCurrentLocation(Point(location.latitude, location.longitude))
+                updateMarkerInCurrentLocation(Point(location.latitude, location.longitude))
+            }
+        }
+    }
 
     /*
         Additional
      */
+
+    private fun moveToCurrentLocation(currentLocation: Point) {
+        binding.mapview.mapWindow.map.move(
+            CameraPosition(currentLocation, ZOOM_VALUE, 0.0f, 0.0f),
+            Animation(Animation.Type.SMOOTH, 5f),
+            null
+        )
+    }
+
+    private fun createMarkerInCurrentLocation() {
+        val mapObject = binding.mapview.mapWindow.map.mapObjects
+
+        marker = mapObject.addPlacemark()
+        marker.setIcon(
+            ImageProvider.fromResource(
+                requireContext(),
+                R.drawable.marker
+            )
+        )
+    }
+
+    private fun updateMarkerInCurrentLocation(currentLocation: Point) {
+        marker.geometry = currentLocation
+
+    }
+
+
     @RequiresPermission(
         anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
     )
