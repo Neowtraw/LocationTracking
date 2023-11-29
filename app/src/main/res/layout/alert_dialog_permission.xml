@@ -7,29 +7,39 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="30dp"
         android:background="@drawable/background_main_rounded"
-        android:padding="16dp"
-        android:layout_marginEnd="100dp"
-        android:layout_marginStart="100dp">
+        android:padding="@dimen/main_padding">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/warning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/main_text"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="@string/warning"
             android:textColor="@color/main_text_color"
-            android:text="@string/location_permission_warning"/>
+            android:textSize="17sp" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/warning"
+            android:textColor="@color/main_text_color"
+            android:textSize="@dimen/main_text" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/positive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/accept_permissions"
-            android:textSize="@dimen/main_text"
-            android:textColor="@color/main_text_color"
+            android:layout_below="@id/title"
             android:layout_alignParentEnd="true"
-            android:layout_below="@id/warning"
-            android:paddingTop="@dimen/main_padding"
-            />
+            android:layout_marginTop="@dimen/main_padding"
+            android:background="@drawable/background_alert_btn_rounded"
+            android:padding="10dp"
+            android:textColor="@color/main_text_color"
+            android:textSize="@dimen/main_text" />
 
 
     </RelativeLayout>

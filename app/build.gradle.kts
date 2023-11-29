@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.work)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.fragment)
+    implementation(libs.androidx.constraintlayout)
 
     // lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)

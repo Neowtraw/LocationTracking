@@ -2,19 +2,21 @@ package com.codingub.locationtracking.ui.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.codingub.locationtracking.R
 import com.codingub.locationtracking.databinding.FragmentTrackingBinding
+import com.codingub.locationtracking.ui.custom.AlertDialog
+import com.codingub.locationtracking.ui.custom.AlertDialogPermissionBuilder
+import com.codingub.locationtracking.ui.custom.AlertDialogPermissionView
 import com.codingub.locationtracking.ui.geo.GeofenceManager
+import com.codingub.locationtracking.ui.utils.openAppSettings
 import com.codingub.locationtracking.ui.viewmodels.TrackingViewModel
 import com.codingub.locationtracking.utils.BaseFragment
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,6 +26,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
@@ -38,6 +41,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+
 
 @SuppressLint("MissingPermission")
 @AndroidEntryPoint
@@ -58,7 +62,8 @@ class TrackingFragment : BaseFragment() {
 
     // geo permissions
     private lateinit var locationPermissionRequest: ActivityResultLauncher<Array<String>>
-    private lateinit var backgroundPermissionRequest: ActivityResultLauncher<String>
+    private var hasCoarseLocPermission = false
+    private var alertDialog: AlertDialog? = null
 
     companion object {
         const val ZOOM_VALUE = 16.5f
@@ -66,56 +71,31 @@ class TrackingFragment : BaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        createLocationEffect()
 
-        // main permissions
         locationPermissionRequest =
             requireActivity().registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-                when {
-                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                        createLocationRequest(true)
+                val hasFineLocPermission =
+                    permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false)
+                hasCoarseLocPermission =
+                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false)
 
-                    }
-
-                    permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                        createLocationRequest(false)
-                    }
-
-                    else -> {
-
-                    }
-                }
-            }
-
-        // background location permission
-        backgroundPermissionRequest =
-            requireActivity().registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (isGranted) {
-                    // Permission is granted. Continue the action or workflow in your
-                    // app.
+                if (hasFineLocPermission && hasCoarseLocPermission) {
+                    setLocationSettings(true)
+                } else if (hasCoarseLocPermission) {
+                    setLocationSettings(false)
                 } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // feature requires a permission that the user has denied. At the
-                    // same time, respect the user's decision. Don't link to system
-                    // settings in an effort to convince the user to change their
-                    // decision.
+                    createAlertPermissionDialog()
                 }
             }
 
         locationPermissionRequest.launch(
             arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
             )
         )
-
-        // background location
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            backgroundPermissionRequest.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-        }
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-        createLocationEffect()
-        createLocationRequest(true)
     }
 
     override fun onCreateView(
@@ -125,6 +105,8 @@ class TrackingFragment : BaseFragment() {
     ): View {
         binding = FragmentTrackingBinding.inflate(inf, con, false)
         MapKitFactory.initialize(requireContext())
+
+        createBottomSheetInformation()
         return binding.root
     }
 
@@ -133,8 +115,8 @@ class TrackingFragment : BaseFragment() {
 
         MapKitFactory.getInstance().onStart()
         binding.mapview.onStart()
-        startLocationUpdates()
-        createMarkerInCurrentLocation()
+
+        if(hasCoarseLocPermission) startLocationUpdates()
     }
 
     override fun onStop() {
@@ -148,9 +130,13 @@ class TrackingFragment : BaseFragment() {
         Geo updates
      */
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
+    private fun setLocationSettings(usePreciseLocation: Boolean) {
+        createLocationRequest(usePreciseLocation)
+        createMarkerInCurrentLocation()
+        startLocationUpdates()
+    }
+
+
     private fun createLocationRequest(usePreciseLocation: Boolean) {
         val priority = if (usePreciseLocation) {
             Priority.PRIORITY_HIGH_ACCURACY
@@ -161,10 +147,8 @@ class TrackingFragment : BaseFragment() {
             LocationRequest.Builder(priority, TimeUnit.SECONDS.toMillis(3)).build()
     }
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
-    fun startLocationUpdates() {
+
+    private fun startLocationUpdates() {
         fusedLocationClient.requestLocationUpdates(
             trackingViewModel.locationRequest.value!!,
             locationCallback,
@@ -172,16 +156,11 @@ class TrackingFragment : BaseFragment() {
         )
     }
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
-    fun stopLocationUpdates() {
+
+    private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
     private fun createLocationEffect() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
@@ -196,6 +175,14 @@ class TrackingFragment : BaseFragment() {
         Additional
      */
 
+    private fun createBottomSheetInformation() {
+        BottomSheetBehavior.from(binding.bottomSheet).apply {
+            peekHeight = 130
+            state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
+    // camera
     private fun moveToCurrentLocation(currentLocation: Point) {
         binding.mapview.mapWindow.map.move(
             CameraPosition(currentLocation, ZOOM_VALUE, 0.0f, 0.0f),
@@ -204,6 +191,7 @@ class TrackingFragment : BaseFragment() {
         )
     }
 
+    // marker
     private fun createMarkerInCurrentLocation() {
         val mapObject = binding.mapview.mapWindow.map.mapObjects
 
@@ -218,13 +206,31 @@ class TrackingFragment : BaseFragment() {
 
     private fun updateMarkerInCurrentLocation(currentLocation: Point) {
         marker.geometry = currentLocation
-
     }
 
+    private fun deleteMarker() = binding.mapview.mapWindow.map.mapObjects.remove(marker)
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
+    // alert permission dialog
+    private fun createAlertPermissionDialog() {
+        if (alertDialog != null) return
+
+        val view = AlertDialogPermissionView(requireContext(),
+            AlertDialogPermissionBuilder(
+                warning = R.string.location_permission_warning,
+                positiveText = R.string.accept_permissions,
+                positiveOnClick = {
+                    requireActivity().openAppSettings()
+                    alertDialog?.dismiss()
+                }
+            ))
+        alertDialog = AlertDialog(requireContext()).apply {
+            setView(view)
+            setOnDismissListener {
+                alertDialog = null
+            }
+        }.also { it.show() }
+    }
+
     // getting last known location is faster and minimizes battery usage
     private fun getLastKnownLocation() {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -240,9 +246,7 @@ class TrackingFragment : BaseFragment() {
         }
     }
 
-    @RequiresPermission(
-        anyOf = [Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION],
-    )
+
     //To get more accurate or fresher device location use this method
     private fun getCurrentLocation(usePreciseLocation: Boolean) {
         lifecycleScope.launch(Dispatchers.IO) {

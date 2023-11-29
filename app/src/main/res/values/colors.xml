@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="background">#FFFFFFFF</color>
+    <color name="add_background">#EDEDED</color>
 
 
     <!-- circle -->
