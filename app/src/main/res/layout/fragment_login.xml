@@ -35,7 +35,7 @@
         android:layout_marginEnd="@dimen/main_padding"
         android:layout_marginBottom="100dp"
         android:background="@drawable/background_main_rounded"
-        android:drawableEnd="@drawable/google"
+        android:drawableEnd="@drawable/ic_google"
         android:elevation="5dp"
         android:gravity="center"
         android:padding="10dp"

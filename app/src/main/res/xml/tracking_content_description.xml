@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        android:id="@+id/transition1"
+        app:constraintSetEnd="@id/bottomSheetHalfOpen"
+        app:constraintSetStart="@id/bottomSheetHidden">
+
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:onTouchUp="autoCompleteToStart"
+            app:touchAnchorId="@+id/gpsInfoPlaceHolder"
+            app:touchAnchorSide="top" />
+
+    </Transition>
+
+    <Transition
+        android:id="@+id/transition2"
+        app:constraintSetEnd="@id/bottomSheetOpenQuarterScreen"
+        app:constraintSetStart="@id/bottomSheetHalfOpen">
+
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:touchAnchorId="@+id/gpsInfoPlaceHolder"
+            app:touchAnchorSide="top" />
+    </Transition>
+
+
+    <Transition
+        android:id="@+id/transition3"
+        app:constraintSetEnd="@id/bottomSheetOpenFullScreen"
+        app:constraintSetStart="@id/bottomSheetOpenQuarterScreen">
+
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:touchAnchorId="@+id/gpsInfoPlaceHolder"
+            app:touchAnchorSide="top" />
+
+    </Transition>
+
+
+    <ConstraintSet android:id="@+id/bottomSheetHidden">
+        <Constraint android:id="@id/gpsInfoPlaceHolder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/gpsImagesPlaceholder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+
+    <ConstraintSet
+        android:id="@+id/bottomSheetHalfOpen"
+        app:deriveConstraintsFrom="@id/bottomSheetHidden">
+        <Constraint android:id="@id/gpsInfoPlaceHolder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="320dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/gpsImagesPlaceholder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+
+    <ConstraintSet
+        android:id="@+id/bottomSheetOpenFullScreen"
+        app:deriveConstraintsFrom="@id/bottomSheetHidden">
+
+        <Constraint android:id="@id/gpsImagesPlaceholder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                app:layout_constraintBottom_toTopOf="@+id/gpsInfoPlaceHolder"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/gpsInfoPlaceHolder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="700dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+    <ConstraintSet
+        android:id="@+id/bottomSheetOpenQuarterScreen"
+        app:deriveConstraintsFrom="@id/bottomSheetHalfOpen">
+
+        <Constraint android:id="@id/gpsImagesPlaceholder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintBottom_toTopOf="@+id/gpsInfoPlaceHolder"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+
+        <Constraint android:id="@id/gpsInfoPlaceHolder">
+            <Layout
+                android:layout_width="match_parent"
+                android:layout_height="550dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+        </Constraint>
+    </ConstraintSet>
+
+</MotionScene>

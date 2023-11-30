@@ -6,6 +6,8 @@
     <color name="background">#FFFFFFFF</color>
     <color name="add_background">#EDEDED</color>
 
+    <color name="bottom_sheet">#696969</color>
+
 
     <!-- circle -->
     <color name="main_text_color">#144A60</color>

@@ -2,7 +2,9 @@ package com.codingub.locationtracking.ui.fragments
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import com.codingub.locationtracking.ui.custom.AlertDialog
 import com.codingub.locationtracking.ui.custom.AlertDialogPermissionBuilder
 import com.codingub.locationtracking.ui.custom.AlertDialogPermissionView
 import com.codingub.locationtracking.ui.geo.GeofenceManager
+import com.codingub.locationtracking.ui.utils.dp
 import com.codingub.locationtracking.ui.utils.openAppSettings
 import com.codingub.locationtracking.ui.viewmodels.TrackingViewModel
 import com.codingub.locationtracking.utils.BaseFragment
@@ -41,6 +44,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 
 @SuppressLint("MissingPermission")
@@ -68,6 +72,11 @@ class TrackingFragment : BaseFragment() {
     companion object {
         const val ZOOM_VALUE = 16.5f
     }
+
+
+    private var prevOffset = 0f
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -176,10 +185,7 @@ class TrackingFragment : BaseFragment() {
      */
 
     private fun createBottomSheetInformation() {
-        BottomSheetBehavior.from(binding.bottomSheet).apply {
-            peekHeight = 130
-            state = BottomSheetBehavior.STATE_COLLAPSED
-        }
+
     }
 
     // camera
